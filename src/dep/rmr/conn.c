@@ -8,6 +8,7 @@
 #include <sys/param.h>
 #include <stdio.h>
 #include <assert.h>
+#include "log_time.h"
 
 static void MRConn_ConnectCallback(const redisAsyncContext *c, int status);
 static void MRConn_DisconnectCallback(const redisAsyncContext *, int);
@@ -122,6 +123,9 @@ int MRConn_SendCommand(MRConn *c, MRCommand *cmd, redisCallbackFn *fn, void *pri
   }
   // printf("Sending to %s:%d\n", c->ep.host, c->ep.port);
   // MRCommand_Print(cmd);
+
+  RS_LOG_TIME("time of sending in SendCommand");
+
   return redisAsyncCommandArgv(c->conn, fn, privdata, cmd->num, (const char **)cmd->strs,
                                cmd->lens);
 }

@@ -19,6 +19,7 @@
 #include "cluster.h"
 #include "chan.h"
 #include "rq.h"
+#include "log_time.h"
 
 extern int redisMajorVesion;
 
@@ -116,6 +117,7 @@ void *MRCtx_GetPrivdata(struct MRCtx *ctx) {
 }
 
 RedisModuleCtx *MRCtx_GetRedisCtx(struct MRCtx *ctx) {
+  RS_LOG_TIME("time of receiving in GetRedisCtx");
   return ctx->redisCtx;
 }
 
@@ -165,6 +167,8 @@ static void fanoutCallback(redisAsyncContext *c, void *r, void *privdata) {
   MRCtx *ctx = privdata;
   struct timespec now;
   clock_gettime(CLOCK_REALTIME, &now);
+
+  RS_LOG_TIME("time of receiving in fanoutCallback");
 
   if (ctx->numReplied == 0 && ctx->numErrored == 0) {
     clock_gettime(CLOCK_REALTIME, &ctx->firstRespTime);

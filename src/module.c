@@ -30,6 +30,7 @@
 #include <sys/param.h>
 #include <pthread.h>
 #include <stdbool.h>
+#include "log_time.h"
 
 #define CLUSTERDOWN_ERR "ERRCLUSTER Uninitialized cluster state, could not perform command"
 
@@ -47,6 +48,8 @@ int chainReplyReducer(struct MRCtx *mc, int count, MRReply **replies) {
 
   RedisModuleCtx *ctx = MRCtx_GetRedisCtx(mc);
 
+  RS_LOG_TIME("time of sending in allOKReducer");
+
   RedisModule_ReplyWithArray(ctx, count);
   for (int i = 0; i < count; i++) {
     MR_ReplyWithMRReply(ctx, replies[i]);
@@ -61,6 +64,8 @@ int uniqueStringsReducer(struct MRCtx *mc, int count, MRReply **replies) {
   RedisModuleCtx *ctx = MRCtx_GetRedisCtx(mc);
 
   MRReply *err = NULL;
+
+  RedisModule_Log(RSDummyContext, "notice", "time of receiving: %f ", curTimeNs());
 
   TrieMap *dict = NewTrieMap();
   int nArrs = 0;
@@ -796,6 +801,7 @@ static int searchResultReducer(struct MRCtx *mc, int count, MRReply **replies) {
   rCtx.searchCtx = req;
 
   for (int i = 0; i < count; i++) {
+    RS_LOG_TIME("time of receiving");
     MRReply *reply = (!profile) ? replies[i] : MRReply_ArrayElement(replies[i], 0);
     processSearchReply(reply, &rCtx, ctx);
   }

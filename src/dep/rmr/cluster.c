@@ -4,6 +4,7 @@
 #include "crc16.h"
 #include "crc12.h"
 #include <dep/rmutil/vector.h>
+#include "log_time.h"
 
 #include <stdlib.h>
 
@@ -187,7 +188,10 @@ int MRCluster_FanoutCommand(MRCluster *cl, MRCoordinationStrategy strategy, MRCo
 
   int ret = 0;
   MRClusterNode *n;
+
+
   while (NULL != (n = it.Next(&it))) {
+    RS_LOG_TIME("time of receiving in fanout");
     if ((strategy & MRCluster_MastersOnly) && !(n->flags & MRNode_Master)) {
       continue;
     }
